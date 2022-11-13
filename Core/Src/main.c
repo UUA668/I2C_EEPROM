@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "M24_EEPROM.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -32,11 +32,12 @@ I2C_HandleTypeDef hi2c1;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define EEPROM_SIZE 256
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -44,6 +45,7 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+uint8_t Data [EEPROM_SIZE];
 
 /* USER CODE END PV */
 
@@ -93,6 +95,11 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   M24_init (&hi2c1);
+  M24_read(U1.DevAddress, 0x0000, &Data[0], U1.EepromSize);
+  HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
+  M24_clear(&U1);
+  M24_read(U1.DevAddress, 0x0000, &Data[0], U1.EepromSize);
+  HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
