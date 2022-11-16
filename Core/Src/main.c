@@ -95,17 +95,18 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   M24_init (&hi2c1);
-  M24_read(U1.DevAddress, 0x0000, &Data[0], U1.EepromSize);
-  HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
-  M24_clear(&U1);
-  M24_read(U1.DevAddress, 0x0000, &Data[0], U1.EepromSize);
-  HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
+  M24_read(U1.DevAddress, START_ADDRESS, U1.MemAddSize, &Data[0], U1.EepromSize);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  M24_clear(&U1);
+	    M24_read(U1.DevAddress, START_ADDRESS, U1.MemAddSize, &Data[0], U1.EepromSize);
+	    //HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

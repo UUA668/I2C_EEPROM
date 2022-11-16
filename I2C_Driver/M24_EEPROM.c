@@ -10,7 +10,7 @@
 I2C_HandleTypeDef *pi2chandle = NULL;
 
 /*define and pointer for reset_data*/
-uint16_t reset_data = 0xFF;
+uint8_t reset_data = 0xEE;
 uint8_t *ptr_reset_data = &reset_data;
 
 
@@ -19,8 +19,8 @@ M24_status_t M24_state_flag = M24_NOK;
 /*EEPROM Device List*/
 EEPROM_Config_t EEPROM_Dev_List[] =
 {
-		{0b10101000, 400, 256, 8, 16},			/*M24C02-FMC6TG, U1 on the board*/
-		{0b10101010, 400, 32000, 16, 64}, 		/*M24256-DFDW6TP, U2 on the board*/
+		{0b10101000, 400, 256, 1, 16},			/*M24C02-FMC6TG, U1 on the board*/
+		{0b10101010, 400, 32000, 2, 64}, 		/*M24256-DFDW6TP, U2 on the board*/
 		{0b10101100, 400, 128000, 17, 256},		/*M24M01-DFMN6TP, U3 on the board*/
 };
 
@@ -57,10 +57,10 @@ M24_status_t M24_init(I2C_HandleTypeDef *hi2c)
 }
 
 
-M24_status_t M24_read(uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t Size)
+M24_status_t M24_read(uint16_t DevAddress, uint32_t MemAddress, uint8_t MemAddSize, uint8_t *pData, uint32_t Size)
 {
 
-	uint8_t MemAddSize = 1;
+
 
 	/*check the incoming parameters*/
 		if(NULL == pi2chandle)
@@ -70,7 +70,7 @@ M24_status_t M24_read(uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, 
 
 
 
-		if(HAL_I2C_Mem_Read(pi2chandle, DevAddress, MemAddress, MemAddSize, pData, Size, I2C_TIMEOUT) == HAL_OK)
+		if(HAL_I2C_Mem_Read(pi2chandle, DevAddress, (uint16_t) MemAddress, MemAddSize, pData, Size, I2C_TIMEOUT) == HAL_OK)
 		{
 			return M24_OK;
 		}
@@ -80,7 +80,7 @@ M24_status_t M24_read(uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, 
 
 M24_status_t M24_clear(EEPROM_Config_t *pEEPROM)
 {
-	uint16_t i = 0;
+	uint16_t i = START_ADDRESS;
 
 	/*check the incoming parameters*/
 			if((NULL == pEEPROM) || (NULL == pi2chandle))
@@ -88,13 +88,17 @@ M24_status_t M24_clear(EEPROM_Config_t *pEEPROM)
 				return M24_NOK;
 			}
 
+	HAL_GPIO_WritePin(GPIOA, WC_Pin, GPIO_PIN_RESET);
+
 
 	/*clear all the memory*/
 	do
 	{
-	HAL_I2C_Mem_Write(pi2chandle, pEEPROM->DevAddress, 0x0000, pEEPROM->MemAddSize, ptr_reset_data, pEEPROM->EepromSize, I2C_TIMEOUT);
+	HAL_I2C_Mem_Write(pi2chandle, pEEPROM->DevAddress, i, pEEPROM->MemAddSize, ptr_reset_data, 1, I2C_TIMEOUT);
 	i++;
 	}while(i<pEEPROM->EepromSize);
+
+	HAL_GPIO_WritePin(GPIOA, WC_Pin, GPIO_PIN_SET);
 
 	return M24_OK;
 }
