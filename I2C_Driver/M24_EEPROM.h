@@ -34,6 +34,8 @@ typedef struct{
 	uint16_t			PageSize;		/*Page Size from Datasheet in byte*/
 }EEPROM_Config_t;
 
+
+
 extern EEPROM_Config_t EEPROM_Dev_List[];
 
 
@@ -47,5 +49,7 @@ extern M24_status_t M24_init(I2C_HandleTypeDef *hi2c);
 extern M24_status_t M24_read(uint16_t DevAddress, uint32_t MemAddress, uint8_t MemAddSize, uint8_t *pData, uint32_t Size);
 
 extern M24_status_t M24_clear(EEPROM_Config_t *pEEPROM);
+
+
 
 #endif /* M24_EEPROM_H_ */

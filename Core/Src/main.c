@@ -32,12 +32,12 @@ I2C_HandleTypeDef hi2c1;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define EEPROM_SIZE 256
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define EEPROM_SIZE 256
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -45,7 +45,8 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t Data [EEPROM_SIZE];
+
+uint8_t Data[EEPROM_SIZE];
 
 /* USER CODE END PV */
 
@@ -95,7 +96,12 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   M24_init (&hi2c1);
+  M24_clear(&U1);
   M24_read(U1.DevAddress, START_ADDRESS, U1.MemAddSize, &Data[0], U1.EepromSize);
+
+  M24_clear(&U2);
+  M24_read(U1.DevAddress, START_ADDRESS, U1.MemAddSize, &Data[0], U1.EepromSize);
+  M24_read(U2.DevAddress, START_ADDRESS, U2.MemAddSize, &Data[0], U2.EepromSize);
 
 
   /* USER CODE END 2 */
@@ -104,8 +110,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  M24_clear(&U1);
-	    M24_read(U1.DevAddress, START_ADDRESS, U1.MemAddSize, &Data[0], U1.EepromSize);
+	 /*clear data array*/
+	  Data_clear();
+
 	    //HAL_UART_Transmit(&huart2, &Data[0], U1.EepromSize, 1000);
     /* USER CODE END WHILE */
 
@@ -285,6 +292,15 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+void Data_clear(void)
+{
+	for (int i = 0; i < EEPROM_SIZE; i++)
+	{
+		Data[i] = 0;
+	}
+}
 
 /* USER CODE END 4 */
 

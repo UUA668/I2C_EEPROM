@@ -10,9 +10,8 @@
 I2C_HandleTypeDef *pi2chandle = NULL;
 
 /*define and pointer for reset_data*/
-uint8_t reset_data = 0xEE;
+uint8_t reset_data = 200;
 uint8_t *ptr_reset_data = &reset_data;
-
 
 M24_status_t M24_state_flag = M24_NOK;
 
@@ -24,8 +23,10 @@ EEPROM_Config_t EEPROM_Dev_List[] =
 		{0b10101100, 400, 128000, 17, 256},		/*M24M01-DFMN6TP, U3 on the board*/
 };
 
+
 M24_status_t M24_init(I2C_HandleTypeDef *hi2c)
 {
+
 	/*check the incoming parameters*/
 	if(NULL == hi2c)
 	{
@@ -94,11 +95,16 @@ M24_status_t M24_clear(EEPROM_Config_t *pEEPROM)
 	/*clear all the memory*/
 	do
 	{
-	HAL_I2C_Mem_Write(pi2chandle, pEEPROM->DevAddress, i, pEEPROM->MemAddSize, ptr_reset_data, 1, I2C_TIMEOUT);
-	i++;
+	if(HAL_I2C_IsDeviceReady(pi2chandle, pEEPROM->DevAddress, 1, 1) == HAL_OK)
+			{
+			HAL_I2C_Mem_Write(pi2chandle, pEEPROM->DevAddress, i, pEEPROM->MemAddSize, ptr_reset_data, 1, I2C_TIMEOUT);
+			i++;
+			}
+
 	}while(i<pEEPROM->EepromSize);
 
 	HAL_GPIO_WritePin(GPIOA, WC_Pin, GPIO_PIN_SET);
 
 	return M24_OK;
 }
+

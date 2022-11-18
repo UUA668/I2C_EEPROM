@@ -51,6 +51,8 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void Data_init();
+void Data_clear(void);
 
 /* USER CODE BEGIN EFP */
 
